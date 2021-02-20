@@ -1,0 +1,65 @@
+{% extends 'base.html' %} {% block title %} people {% endblock title %} {% block content %}
+<h2 class="my-3 text-center text-info">
+    {% if request.GET.username %} {{ request.GET.username }} {% else %}find friends {% endif %}
+
+</h2>
+<div class="row">
+    <div class="col-md-6 offset-md-3  col-lg-4 offset-lg-4 my-3">
+        <form method="GET">
+            <div class="form-group">
+                <input type="text" name="username" id="" class="form-control" placeholder="username" value="{{ request.GET.username }}" required>
+            </div>
+            <div class="text-center">
+                <button class="btn btn-info">search</button>
+            </div>
+
+        </form>
+    </div>
+    <div class="list-group col-md-10 offset-md-1 my-3">
+        {% for auth_user in users %} {% if user.pk != auth_user.pk and auth_user.pk not in friends %}
+        <div class="list-group-item d-flex justify-content-between ">
+
+            <a class="user-info text-decoration-none" href="{% url 'myapp:profile' auth_user.id %}">
+          {% if auth_user.user_img %}
+          <img src="{{ auth_user.user_img.url }}" alt="" width="50px" height="50px" class="rounded-circle">
+          {% else %}
+          <img src="/static/avatar.jpg" alt="" width="50px" height="50px" class="rounded-circle">
+          {% endif %}
+          <span>{{ auth_user.username }}</span>
+      </a>
+            <div class="d-flex justify-content-end ">
+                {% if auth_user.pk not in requstsIDs and auth_user.id not in senders %}
+                <div class="my-2">
+                    <a href="{% url 'myapp:addfriend' auth_user.pk %}" class="btn btn-info btn-s"><i class="fas fa-plus"></i>follow</a>
+                </div>
+                {% else %}
+                <div class="my-2">
+                    <a href="{% url 'myapp:removerequest' auth_user.pk %}" class="btn btn-danger btn-s mx-1"><i class="fas fa-times"></i>request</a>
+                </div>
+
+                {% endif %} {% if auth_user.id in senders %}
+                <div class="my-2">
+                    <a href="{% url 'myapp:confirmfriendship' auth_user.pk %}" class="btn btn-warning btn-s"><i class="fas fa-check"></i>confirm</a>
+                </div> {% endif %}
+            </div>
+        </div>
+        {% endif %} {% empty %}
+        <h3 class="my-5 text-center"> no users exists {% if request.GET.username %} with username of : <span class="text-info"> {{ request.GET.username }}</span> {% endif %} !!
+        </h3>
+        {% endfor %}
+        <div class="pagination d-flex justify-content-center w-100 my-5">
+
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}&username={{  request.GET.username}}" class=" mx-5 btn btn-info"><i class="fas fa-backward"></i></a> {% endif %}
+            <span class="current mx-5 text-info my-2">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span> {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}&username={{  request.GET.username}}" class="mx-5 btn btn-info"><i class="fas fa-forward"></i> </a> {% endif %}
+
+        </div>
+    </div>
+
+</div>
+
+
+{% endblock content %}

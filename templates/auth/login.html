@@ -1,0 +1,32 @@
+{% extends "base.html" %} {% block title %} register {% endblock title %} {% block content%}
+<div class="card text-left col-md-6 offset-md-3 my-5">
+    <div class="card-body">
+        <h4 class="card-title my-3 pb-2 border-bottom border-info text-info">Login</h4>
+
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            {{ form.errors }}
+        </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">username</label> {{ form.username }}
+            </div>
+
+            <div class="form-group">
+                <label for="id_password">password</label> {{ form.password }}
+            </div>
+            <button class="btn btn-info"> login</button>
+            <div class="d-flex my-3 justify-content-end">
+                <a href="{% url 'social:begin' 'facebook' %}" class="btn  mx-1" style="background:#3b5998;color:#FFF"><i class="fab fa-facebook-f"></i>  with Facebook</a>
+                <a href="{% url 'social:begin' 'github' %}" class="btn  mx-1" style="background:#211F1F;color:#FFF"><i class="fab fa-github"></i>  with github</a>
+                <a href="{% url 'social:begin' 'twitter' %}" class="btn  " style="background:#00acee;color:#FFF"><i class="fab fa-twitter"></i> with twitter</a>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

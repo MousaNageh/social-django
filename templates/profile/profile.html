@@ -1,0 +1,111 @@
+{% extends "base.html" %} {% block title %} profile {% endblock title %} {% block content %}
+
+<div class="row my-5 ">
+    <div class="col-md-5">
+        <div class="card-user">
+            {% if profile.user_img %}
+            <img src="{{ profile.user_img.url  }}" alt="Person" class="card__image"> {% else %}
+            <img src="/static/avatar.jpg" alt="Person" class="card__image"> {% endif %}
+            <p class="card__name text-info">
+                {{ profile.username }}
+            </p>
+
+            {% if user.pk == profile.pk %}
+            <div class="grid-container">
+
+                <div class="grid-child-posts">
+                    <form method="GET" class="btn btn-info "> <span>{{ followers.count }}</span>
+                        <input type="hidden" name="followers" value="true">
+                        <button class="btn btn-info"> followers</button>
+                    </form>
+                </div>
+                <div class="grid-child-followers">
+                    <form method="GET" class="btn btn-info "> <span>{{ followers.count }}</span>
+                        <input type="hidden" name="posts" value="true">
+                        <button class="btn btn-info"> your posts</button>
+                    </form>
+                </div>
+            </div>
+            <a class="btn-user btn draw-border" href="{% url 'myapp:editprofile' user.pk %}">edit profile </a>
+            <a class="btn-user btn draw-border" href="{% url 'myapp:editprofile' user.pk %}"><i class="fas fa-share-square"></i>sent </a>
+            <a class="btn-user btn draw-border" href="{% url 'myapp:editprofile' user.pk %}"> <i class="fas fa-hands-helping"></i> recieved </a> {% else %}
+            <div class="grid-container">
+
+                <div class="grid-child-posts">
+                    <p class="p-1 text-center btn-info rounded-right rounded-left">{{ user_follows_count }} followers </p>
+                </div>
+                <div class="grid-child-followers">
+                    <p class="p-1 text-center btn-info rounded-right rounded-left">posts</p>
+                </div>
+            </div>
+
+
+
+
+            {% if profile.id not in friends_ids and profile.id not in sent_requests_ids and profile.id not in recieved_requests_ids %}
+            <a class="btn-user btn draw-border" href="{% url 'myapp:addfriend' profile.pk %}">follow </a> {% elif profile.id in sent_requests_ids %}
+            <a class="btn-user btn draw-border text-danger" href="{% url 'myapp:removerequest' profile.pk %}"><i class="fas fa-times"></i> Request </a> {% elif profile.id in friends_ids %}
+            <small class="text-info">you are friends <i class="far fa-smile-wink"></i> </small>
+            <a class="btn-user btn draw-border test-danger" href="{% url 'myapp:removerequest' profile.pk %}">unfollow</a> {% elif profile.id in recieved_requests_ids %}
+            <small class="text-info"> {{  profile.username }} wants to follow you ? <i class="fa fa-smile-o" aria-hidden="true"></i></small>
+            <a class="btn-user btn draw-border" href="{% url 'myapp:confirmfriendship' profile.pk %}"><i class="fas fa-check"></i> confirm</a>
+            <a class="btn-user btn draw-border text-danger" href="{% url 'myapp:removerequest' profile.pk %}"><i class="fas fa-times"></i> delete</a> {% endif %} {% endif %}
+            <div>
+                <small class="d-block my-2 text-info ">full name : {{ profile.first_name }} {{ profile.last_name }}</small>
+                <small class="d-block my-2 text-info ">email : {{ profile.email }}</small>
+                <small class="d-block my-2 text-info ">joined at  : {{ profile.date_joined|date:"l d-m-Y " }}</small>
+            </div>
+        </div>
+    </div>
+    {% if request.GET.followers %}
+    <div class="col-md-7">
+        <h3 class="text-info text-center">follows </h3>
+        <div class="row">
+            {% for follower in followers %} {% if follower.from_user.id != user.pk %}
+            <div class="col-4 co-md-4 col-lg-3 follower-card" style="height: 200px;">
+                <div class="card text-left text-decoration-none my-4">
+                    <a href="{% url 'myapp:profile' follower.from_user.id  %}">
+                      {% if follower.from_user.user_img %}
+                      <img class="card-img-top " src="/media/{{ follower.from_user.user_img }}" height="100px" width="100px">
+                      {% else %}
+                      <img class="card-img-top " src="/static/avatar.jpg" alt=" " height="100px" width="100px">
+                      {% endif %}
+                    </a>
+                    <div class="card-body ">
+                        <small class="card-title ">{{ follower.from_user.username }}</small>
+                    </div>
+                </div>
+            </div>
+            {% endif %} {% if follower.to_user.id != user.pk %}
+            <div class="col-6 co-md-4 col-lg-3 follower-card">
+                <div class="card text-left text-decoration-none my-4">
+                    <a href="{% url 'myapp:profile' follower.from_user.id  %}">
+                      {% if  follower.to_user.user_img %}
+                      <img class="card-img-top " src="/media/{{ follower.to_user.user_img }}" height="100px" width="100px">
+                      {% else %}
+                      <img class="card-img-top " src="/static/avatar.jpg" alt=" " height="100px" width="100px">
+                      {% endif %}
+                    </a>
+                    <div class="card-body ">
+                        <small class="card-title ">{{ follower.to_user.username }}</small>
+                    </div>
+                </div>
+            </div>
+            {% endif %} {% endfor %}
+        </div>
+        {% else %}
+        <div class="col-md-7">
+            <h3 class="text-info text-center">posts </h3>
+            {% for x in '0123456789'|make_list %}
+            <div class="card text-left  my-4">
+                <img class="card-img-top " src="holder.js/100px180/ " alt=" ">
+                <div class="card-body ">
+                    <h4 class="card-title ">Title</h4>
+                    <p class="card-text ">Body</p>
+                </div>
+            </div>
+            {% endfor %} {% endif %}
+        </div>
+    </div>
+
+    {% endblock content %}

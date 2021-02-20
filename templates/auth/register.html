@@ -1,0 +1,47 @@
+{% extends "base.html" %} {% block title %} {% if edit %} edit profile {% else %} Register {% endif %}{% endblock title %} {% block content%}
+<div class="card text-left col-md-6 offset-md-3 my-5">
+    <div class="card-body">
+        {% if edit %}
+        <h4 class="card-title my-3 pb-2 border-bottom border-info text-info">edit profile</h4>
+        {% else %}
+        <h4 class="card-title my-3 pb-2 border-bottom border-info text-info">Register</h4>
+        {% endif %} {% if form.errors %}
+        <div class="alert alert-danger">
+            {{ form.errors }}
+        </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="id_username">username</label> {{ form.username }}
+            </div>
+            <div class="form-group">
+                <label for="id_email">email</label> {{ form.email }}
+            </div>
+            <div class="form-group">
+                <label for="id_password">password</label> {{ form.password }}
+            </div>
+            <div class="form-group">
+                <label for="id_first_name">first name</label> {{ form.first_name }}
+            </div>
+            <div class="form-group">
+                <label for="id_last_name">last name</label> {{ form.last_name }}
+            </div>
+            <div class="form-group">
+                <label for="id_user_img">user img</label> {{ form.user_img }}
+            </div>
+            <button class="btn btn-info"> save</button> {% if not edit %}
+            <div class="d-flex my-3 justify-content-end">
+                <a href="{% url 'social:begin' 'facebook' %}" class="btn  mx-1" style="background:#3b5998;color:#FFF"><i class="fab fa-facebook-f"></i>  with Facebook</a>
+                <a href="{% url 'social:begin' 'github' %}" class="btn  mx-1" style="background:#211F1F;color:#FFF"><i class="fab fa-github"></i>  with github</a>
+                <a href="{% url 'social:begin' 'twitter' %}" class="btn  " style="background:#00acee;color:#FFF"><i class="fab fa-twitter"></i> with twitter</a>
+
+            </div>
+            {% endif %}
+
+        </form>
+    </div>
+</div>
+
+{% endblock content %}

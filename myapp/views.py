@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from myapp.models import User, FriendRequest, Post
+from myapp.models import User, FriendRequest, Post, Comment
 from django.http import HttpResponse, JsonResponse
 from django.views.generic import TemplateView, DetailView, ListView, FormView
 from django.views.generic.edit import CreateView, UpdateView
-from myapp.forms import UserForm, LoginForm, PostForm
+from myapp.forms import UserForm, LoginForm, PostForm, CommentFrom
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -290,3 +290,24 @@ def deletepost(request, userid, pk):
         post.delete_img(post.img.name)
     post.delete()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+####################################################################################
+
+
+@login_required
+def addcomment(request, postid, userid):
+
+    form = CommentFrom(request.POST)
+    if form.is_valid():
+        user = User.objects.get(id__exact=userid)
+        post = Post.objects.get(id__exact=postid)
+        comment = Comment(user=user, post=post,
+                          content=form.cleaned_data["comment"])
+        comment.save()
+
+    return redirect(reverse("myapp:postcomments", args=[postid]))
+
+
+class CommetDetail(LoginRequiredMixin, DetailView):
+    model = Post
+    template_name = 'posts/postcommets.html'

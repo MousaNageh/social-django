@@ -109,7 +109,18 @@
                     </div>
                     {% endif %}
                     <div class="like">
-                        likes
+                        <a href="" class="stretched-link btn"><i class="far fa-heart"></i> 20</a>
+                        <a href="{% url 'myapp:postcomments' post.id %}" class="stretched-link btn"><i class="far fa-comments"></i> {{ post.comments.count }}</a>
+                    </div>
+                    <div class="p-2 d-flex border-info border rounded">
+                        <div class="border-right flex-grow-0 p-1 border-info"><i class="far fa-smile-beam text-warning fa-2x"></i></div>
+                        <div class="flex-grow-1">
+                            <form method="POST" action="{% url 'myapp:addcomment' post.id user.id %}" class="d-flex cooment-form">
+                                {% csrf_token %}
+                                <textarea type="text" name="comment" cols='60' class="form-control comment-content-{{ post.id }}" required placeholder="add comment"></textarea>
+                                <button class="btn btn-info ">post</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

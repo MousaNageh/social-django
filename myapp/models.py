@@ -27,8 +27,6 @@ class User(auth_user):
         friends = FriendRequest.objects.filter(Q(approved=True) & (Q(
             from_user_id=self.id) | Q(to_user_id=self.id)))
         for friend in friends:
-            print(friend.to_user.id)
-            print(friend.from_user.id)
             if friend.to_user.id != self.id:
                 friends_ids.append(friend.to_user.id)
             if friend.from_user.id != self.id:
@@ -62,3 +60,18 @@ class Post(models.Model):
 
     def delete_img(self, name):
         os.remove(os.path.join(settings.MEDIA_ROOT, name))
+
+    def __str__(self):
+        return self.title
+
+
+class Comment(models.Model):
+    user = models.ForeignKey(
+        User, related_name='comments', on_delete=models.CASCADE)
+    post = models.ForeignKey(
+        Post, related_name='comments', on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(default=timezone.now())
+
+    def __str__(self):
+        return self.content

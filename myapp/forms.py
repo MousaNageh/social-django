@@ -40,3 +40,7 @@ class PostForm(forms.ModelForm):
             "content": forms.Textarea(attrs={"class": "form-control"}),
             "img": forms.FileInput(attrs={"class": "form-control"}),
         }
+
+
+class CommentFrom(forms.Form):
+    comment = forms.CharField(widget=forms.Textarea(), required=True)

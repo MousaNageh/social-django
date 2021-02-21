@@ -25,7 +25,10 @@ class FollowersMiddeware:
             id = int(re.split("/", request.path)[2])
             if int(request.session["_auth_user_id"]) != id:
                 return HttpResponseRedirect("/")
-
+        elif re.search("^/posts/\d+/comments/add/user/\d+$", request.path):
+            id = int(re.split("/", request.path)[6])
+            if int(request.session["_auth_user_id"]) != id:
+                return HttpResponseRedirect("/")
         response = self.get_response(request)
 
         # Code to be executed for each request/response after

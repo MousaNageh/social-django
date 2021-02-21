@@ -1,0 +1,60 @@
+{% extends "base.html" %} {% block title %} posts {% endblock title %} {% block content %} {% load static %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card text-left  my-4">
+            {% if post.img %}
+            <img class="card-img-top " src="{{ post.img.url }}" alt=" "> {% endif %}
+            <div class="card-body ">
+                <h4 class="card-title text-info ">{{ post.title }}</h4>
+                <p class="card-text ">{{ post.content }}
+                    <div>
+                        <small class="text-warning">{{ post.created_at }}</small>
+                    </div>
+                </p>
+                <div class="like">
+                    <a href="" class="stretched-link btn"><i class="far fa-heart"></i> 20</a>
+                    <a href="" class="stretched-link btn"><i class="far fa-comments"></i> {{ post.comments.count }}</a>
+                </div>
+                <div class="p-2 d-flex border-info border rounded">
+                    <div class="border-right flex-grow-0 p-1 border-info"><i class="far fa-smile-beam text-warning fa-2x"></i></div>
+                    <div class="flex-grow-1">
+                        <form method="POST" action="{% url 'myapp:addcomment' post.id user.id %}" class="d-flex cooment-form">
+                            {% csrf_token %}
+                            <textarea type="text" name="comment" cols='50' class="form-control" required placeholder="add comment"></textarea>
+                            <button class="btn btn-info">post</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="my-5">
+
+                    {% for comment in post.comments.all %}
+                    <div class="comment pb-1 border-bottom border-info">
+                        <a href="{% url 'myapp:profile' comment.user.id %}" class="btn">
+                          {% if comment.user.user_img %}
+                          <img src="{{ comment.user.user_img.url }}" alt="" width="50px" height="50px" class="rounded-circle">
+                        {% else %}
+                        <img src="/static/avatar.jpg" alt="" width="50px" height="50px" class="rounded-circle">
+                        {% endif %}
+                        {{  comment.user.username }}
+                        </a>
+                        <p class="pl-3">
+                            {{ comment }}
+                        </p>
+                        <small class="text-warning pl-3"> {{ comment.created_at }}</small> {% if comment.user.id == user.id %}
+                        <div class="d-flex justify-content-end">
+                            <button class="btn btn-success mx-1"><i class="fas fa-edit"></i>edit</button>
+                            <button class="btn btn-danger"><i class="fas fa-times"></i>delete</button>
+                        </div>
+                        {% endif %}
+
+                    </div>
+                    {% empty %}
+                    <h5>no comments at this post !!</h5>
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

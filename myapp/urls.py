@@ -2,7 +2,7 @@ from django.urls import path
 from myapp.views import(Register, LoginView, ProfileDetail, UserUpdateView,
                         logout_view, UsersList, addFriend, removeRequest, confrimRequest,
                         deletefriendship, UserRequerstsDetails, PostCreateView, PostUpdateView, deletepost,
-                        PostsList)
+                        PostsList, addcomment, CommetDetail)
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -28,6 +28,9 @@ urlpatterns = [
     path("posts/<int:userid>/edit/<int:pk>",
          PostUpdateView.as_view(), name="editpost"),
     path("posts/<int:userid>/delete/<int:pk>", deletepost, name="deletepost"),
+    path("posts/<int:postid>/comments/add/user/<int:userid>",
+         addcomment, name='addcomment'),
+    path("posts/<int:pk>/comments/", CommetDetail.as_view(), name='postcomments'),
 
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

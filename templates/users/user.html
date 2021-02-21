@@ -19,7 +19,7 @@
         {% for auth_user in users %} {% if user.pk != auth_user.pk and auth_user.pk not in friends %}
         <div class="list-group-item d-flex justify-content-between ">
 
-            <a class="user-info text-decoration-none" href="{% url 'myapp:profile' auth_user.id %}">
+            <a class="user-info btn" href="{% url 'myapp:profile' auth_user.id %}">
           {% if auth_user.user_img %}
           <img src="{{ auth_user.user_img.url }}" alt="" width="50px" height="50px" class="rounded-circle">
           {% else %}

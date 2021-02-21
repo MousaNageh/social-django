@@ -1,9 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from myapp.models import User, FriendRequest
+from myapp.models import User, FriendRequest, Post
 from django.http import HttpResponse, JsonResponse
 from django.views.generic import TemplateView, DetailView, ListView, FormView
 from django.views.generic.edit import CreateView, UpdateView
-from myapp.forms import UserForm, LoginForm
+from myapp.forms import UserForm, LoginForm, PostForm
 from django.urls import reverse, reverse_lazy
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -70,11 +70,6 @@ class ProfileDetail(DetailView, LoginRequiredMixin):
         if self.kwargs["pk"] != self.request.user.id:
             context["user_follows_count"] = FriendRequest.objects.filter(Q(approved=True) & (
                 Q(from_user_id=self.kwargs["pk"]) | Q(to_user_id=self.kwargs["pk"]))).count()
-            print(context["user_follows_count"])
-            print(context["user_follows_count"])
-            print(context["user_follows_count"])
-            print(context["user_follows_count"])
-            print(context["user_follows_count"])
         friends_id = []
         sent_requests_id = []
         recieved_requests_ids = []
@@ -101,10 +96,12 @@ class ProfileDetail(DetailView, LoginRequiredMixin):
             sent_requests_id.append(fol.to_user_id)
 
         context["friends_ids"] = friends_id
-        # context["sent_requests"] = user_sent_following_requests
-        # context["recieved_requests"] = user_following_requests
         context["sent_requests_ids"] = sent_requests_id
         context["recieved_requests_ids"] = recieved_requests_ids
+
+        context["posts"] = User.objects.get(
+            id__exact=self.kwargs["pk"]).posts.order_by("-created_at")
+
         return context
 
 
@@ -211,4 +208,85 @@ def deletefriendship(request, pk):
     relationship = FriendRequest.objects.get(approved=True & ((Q(to_user_id__exact=pk) & Q(
         from_user__exact=user.pk)) | (Q(from_user_id__exact=pk) & Q(to_user__exact=user.pk))))
     relationship.delete()
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
+class UserRequerstsDetails(LoginRequiredMixin, ListView):
+    model = FriendRequest
+    template_name = 'profile/requestsdetails.html'
+    context_object_name = 'requests'
+
+    def get_queryset(self):
+        return FriendRequest.objects.filter(Q(approved=False) & (Q(from_user_id__exact=self.request.user.pk) | Q(to_user_id__exact=self.request.user.pk))).all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["followers"] = FriendRequest.objects.filter(Q(approved=True) & (
+            Q(from_user_id__exact=self.request.user.pk) | Q(to_user_id__exact=self.request.user.pk))).all()
+        context["profile"] = User.objects.get(id__exact=self.request.user.id)
+        return context
+########################################################################################################
+
+
+class PostsList(LoginRequiredMixin, ListView):
+    model = Post
+    context_object_name = "posts"
+    template_name = 'posts/posts.html'
+    paginate_by = 10
+
+    def get_queryset(self):
+        user_ids = User.objects.get(
+            id__exact=self.request.user.id).friends_ids()
+        return Post.objects.filter(user_id__in=user_ids).all().order_by("-created_at")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_ids = User.objects.get(
+            id__exact=self.request.user.id).friends_ids()
+
+        if len(user_ids) != 0:
+            context["friends"] = True
+        return context
+
+
+class PostCreateView(LoginRequiredMixin, CreateView):
+    model = Post
+    template_name = "posts/postform.html"
+    form_class = PostForm
+
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        user = User.objects.get(id__exact=self.request.user.id)
+        post.user = user
+        post.save()
+        return super().form_valid(form)
+
+
+class PostUpdateView(UpdateView):
+    model = Post
+    template_name = "posts/postform.html"
+    form_class = PostForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["edit"] = True
+        return context
+
+    def form_valid(self, form):
+        post_before_update = Post.objects.get(id__exact=self.kwargs["pk"])
+        post = form.save(commit=False)
+        if "img" in self.request.FILES:
+            if post_before_update.img:
+                post.delete_img(post_before_update.img.name)
+            post.img = self.request.FILES["img"]
+        post.save()
+        return super().form_valid(form)
+
+
+@login_required
+def deletepost(request, userid, pk):
+    post = Post.objects.get(id__exact=pk)
+    if post.img:
+        post.delete_img(post.img.name)
+    post.delete()
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

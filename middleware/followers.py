@@ -15,6 +15,17 @@ class FollowersMiddeware:
             if request.GET.get("followers"):
                 if int(request.session["_auth_user_id"]) != id:
                     return HttpResponseRedirect("/")
+
+        elif re.search("^/profile/userrequestsdetails/\d+$", request.path):
+            id = int(re.split("/", request.path)[3])
+            if int(request.session["_auth_user_id"]) != id:
+                return HttpResponseRedirect("/")
+
+        elif re.search("^/posts/\d+/edit/\d+$", request.path) or re.search("^/posts/\d+/delete/\d+$", request.path):
+            id = int(re.split("/", request.path)[2])
+            if int(request.session["_auth_user_id"]) != id:
+                return HttpResponseRedirect("/")
+
         response = self.get_response(request)
 
         # Code to be executed for each request/response after

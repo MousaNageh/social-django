@@ -1,0 +1,84 @@
+{% extends "base.html" %} {% block title %} profile {% endblock title %} {% block content %}
+
+<div class="row my-5 ">
+    <div class="col-md-5">
+        <div class="card-user">
+            {% if profile.user_img %}
+            <img src="{{ profile.user_img.url  }}" alt="Person" class="card__image"> {% else %}
+            <img src="/static/avatar.jpg" alt="Person" class="card__image"> {% endif %}
+            <p class="card__name text-info">
+                {{ user.username }}
+            </p>
+            <div class="grid-container">
+                <div class="grid-child-posts">
+                    <a class="btn btn-info" href="{% url 'myapp:profile' user.pk %}?followers=true">{{ followers.count }} followers</a>
+                </div>
+                <div class="grid-child-followers">
+                    <a class="btn btn-info ml-3" href="{% url 'myapp:profile' user.pk %}?posts=true">{{ followers.count }} posts</a>
+                </div>
+            </div>
+            <a class="btn-user btn draw-border" href="{% url 'myapp:editprofile' user.pk %}">edit profile </a>
+            <a class="btn-user btn draw-border" href="{% url 'myapp:requestsdetails' user.pk %}"><i class="fas fa-share-square"></i>requests </a>
+            <div>
+                <small class="d-block my-2 text-info ">full name : {{ user.first_name }} {{ user.last_name }}</small>
+                <small class="d-block my-2 text-info ">email : {{ user.email }}</small>
+                <small class="d-block my-2 text-info ">joined at  : {{ user.date_joined|date:"l d-m-Y " }}</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="row">
+            <div class="col-md-6 text-info border-right border-info ">
+                <h4 class="border border-info p-1 text-center rounded-top rounded"> <i class="fas fa-share-square"></i>sent requests </h4>
+                <div class="row">
+                    {% for request in requests %} {% if request.from_user.id == user.id %}
+                    <div class="col-6 col-md-12 col-lg-6">
+                        <div class="card text-left mb-3">
+                            <a href="{% url 'myapp:profile'  request.to_user.id %}">
+                              {% if request.to_user.user_img %}
+                            <img class="card-img-top" src="{{  request.to_user.user_img.url }}" alt="" height="100px"> {% else %}
+                            <img class="card-img-top" src="/static/avatar.jpg" alt="" height="100px"> {% endif %}
+                            </a>
+                            <div class="card-body text-center">
+                                <small class="card-title my-3">{{ request.to_user.username }}</small>
+                                <div class="usre-card my-3">
+                                    <a class="btn btn-danger" href="{% url 'myapp:removerequest' request.to_user.id %}"><i class="fas fa-times"></i> delete </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %} {% endfor %}
+                </div>
+
+            </div>
+            <div class="col-md-6 text-info ">
+                <h4 class="border border-info p-1 text-center rounded"> <i class="fas fa-hands-helping"></i>recieved requests </h4>
+                <div class="row">
+                    {% for request in requests %} {% if request.to_user.id == user.id %}
+                    <div class="col-6 col-md-12 col-lg-6">
+                        <div class="card text-left mb-3">
+                            <a href="{% url 'myapp:profile'  request.to_user.id %}">
+                          {% if request.from_user.user_img %}
+                        <img class="card-img-top" src="{{  request.from_user.user_img.url }}" alt="" height="100px"> {% else %}
+                        <img class="card-img-top" src="/static/avatar.jpg" alt="" height="100px"> {% endif %}
+                        </a>
+                            <div class="card-body text-center">
+                                <small class="card-title my-3">{{ request.from_user.username }}</small>
+                                <div class="usre-card my-3">
+                                    <a class="btn btn-danger my-3" href="{% url 'myapp:removerequest' request.from_user.id %}"><i class="fas fa-times"></i> delete </a>
+                                    <a class="btn btn-warning" href="{% url 'myapp:confirmfriendship' request.from_user.id %}"><i class="fas fa-check"></i> confirm </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %} {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</div>
+</div>
+{% endblock content %}

@@ -25,6 +25,7 @@ label {
 .form-control {
     border: 2px solid #272133;
     box-shadow: 2px 2px 10px #7F204D;
+    color: #FFF
 }
 
 .form-control:focus {

@@ -4,6 +4,8 @@ from django.contrib.auth.models import User as auth_user, PermissionsMixin
 from django.conf import settings
 import os
 from django.utils import timezone
+from django.core import validators
+from django.db.models import Q
 # Create your models here.
 
 
@@ -20,6 +22,19 @@ class User(auth_user):
     def delete_img(self, name):
         os.remove(os.path.join(settings.MEDIA_ROOT, name))
 
+    def friends_ids(self):
+        friends_ids = []
+        friends = FriendRequest.objects.filter(Q(approved=True) & (Q(
+            from_user_id=self.id) | Q(to_user_id=self.id)))
+        for friend in friends:
+            print(friend.to_user.id)
+            print(friend.from_user.id)
+            if friend.to_user.id != self.id:
+                friends_ids.append(friend.to_user.id)
+            if friend.from_user.id != self.id:
+                friends_ids.append(friend.from_user.id)
+        return friends_ids
+
 
 class FriendRequest(models.Model):
     from_user = models.ForeignKey(
@@ -31,3 +46,19 @@ class FriendRequest(models.Model):
 
     def approve_friend_request(self):
         self.approved = True
+
+
+class Post(models.Model):
+    user = models.ForeignKey(User, related_name='posts',
+                             on_delete=models.CASCADE)
+    title = models.CharField(max_length=255, validators=[validators.MaxLengthValidator(
+        255, "post title must be less than 255 character .")])
+    content = models.TextField()
+    img = models.ImageField(upload_to="posts", blank=True, null=True)
+    created_at = models.DateTimeField(default=timezone.now())
+
+    def get_absolute_url(self):
+        return reverse("myapp:profile", kwargs={"pk": self.user.pk})
+
+    def delete_img(self, name):
+        os.remove(os.path.join(settings.MEDIA_ROOT, name))

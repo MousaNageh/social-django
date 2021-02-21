@@ -14,28 +14,22 @@
             <div class="grid-container">
 
                 <div class="grid-child-posts">
-                    <form method="GET" class="btn btn-info "> <span>{{ followers.count }}</span>
-                        <input type="hidden" name="followers" value="true">
-                        <button class="btn btn-info"> followers</button>
-                    </form>
+                    <a class="btn btn-info" href="{% url 'myapp:profile' user.pk %}?followers=true">{{ followers.count }} followers</a>
                 </div>
                 <div class="grid-child-followers">
-                    <form method="GET" class="btn btn-info "> <span>{{ followers.count }}</span>
-                        <input type="hidden" name="posts" value="true">
-                        <button class="btn btn-info"> your posts</button>
-                    </form>
+                    <a class="btn btn-info ml-3
+                    " href="{% url 'myapp:profile' user.pk %}?posts=true">{{ profile.posts.count }} posts</a>
                 </div>
             </div>
             <a class="btn-user btn draw-border" href="{% url 'myapp:editprofile' user.pk %}">edit profile </a>
-            <a class="btn-user btn draw-border" href="{% url 'myapp:editprofile' user.pk %}"><i class="fas fa-share-square"></i>sent </a>
-            <a class="btn-user btn draw-border" href="{% url 'myapp:editprofile' user.pk %}"> <i class="fas fa-hands-helping"></i> recieved </a> {% else %}
+            <a class="btn-user btn draw-border" href="{% url 'myapp:requestsdetails' user.pk %}"><i class="fas fa-share-square"></i>requests </a> {% else %}
             <div class="grid-container">
 
                 <div class="grid-child-posts">
                     <p class="p-1 text-center btn-info rounded-right rounded-left">{{ user_follows_count }} followers </p>
                 </div>
                 <div class="grid-child-followers">
-                    <p class="p-1 text-center btn-info rounded-right rounded-left">posts</p>
+                    <p class="p-1 text-center btn-info rounded-right rounded-left">{{ pofile.posts.count }}posts</p>
                 </div>
             </div>
 
@@ -96,12 +90,27 @@
         {% else %}
         <div class="col-md-7">
             <h3 class="text-info text-center">posts </h3>
-            {% for x in '0123456789'|make_list %}
+            {% for post in posts %}
             <div class="card text-left  my-4">
-                <img class="card-img-top " src="holder.js/100px180/ " alt=" ">
+                {% if post.img %}
+                <img class="card-img-top " src="{{ post.img.url }}" alt=" "> {% endif %}
+
                 <div class="card-body ">
-                    <h4 class="card-title ">Title</h4>
-                    <p class="card-text ">Body</p>
+                    <h4 class="card-title text-info ">{{ post.title }}</h4>
+                    <p class="card-text ">{{ post.content }}
+                        <div>
+                            <small class="text-warning">{{ post.created_at }}</small>
+                        </div>
+                    </p>
+                    {% if profile.id == user.id %}
+                    <div class="d-flex justify-content-end">
+                        <a href="{% url 'myapp:editpost' user.id post.id %}" class="btn btn-success mx-2"><i class="fas fa-edit"></i> edit</a>
+                        <a href="{% url 'myapp:deletepost' user.id post.id %}" class="btn btn-danger"><i class="fas fa-times"></i> delete</a>
+                    </div>
+                    {% endif %}
+                    <div class="like">
+                        likes
+                    </div>
                 </div>
             </div>
             {% endfor %} {% endif %}

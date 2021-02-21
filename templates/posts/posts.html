@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% block title %} posts {% endblock title %} {% block content %}
+<div class="row">
+    {% for post in posts %}
+    <div class="col-md-6 offset-md-3">
+        <div class="card text-left  my-4">
+            {% if post.img %}
+            <img class="card-img-top " src="{{ post.img.url }}" alt=" "> {% endif %}
+            <div class="card-body ">
+                <h4 class="card-title text-info ">{{ post.title }}</h4>
+                <p class="card-text ">{{ post.content }}
+                    <div>
+                        <small class="text-warning">{{ post.created_at }}</small>
+                    </div>
+                </p>
+                <div class="like">
+                    likes
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %} {% if friends %}
+    <div class="text-center w-100">
+        <h4 class="text-center p-5"> no one of your friends created posts yet <i class="fas text-warning fa-sad-cry"></i> !!
+        </h4>
+        <h4 class="text-center p-5"> so follow more friends to get posts <i class="fas text-success fa-smile-wink"></i> ??
+        </h4>
+    </div>
+    <div class="my-5  w-100 text-center ">
+        <a class="btn btn-info" href="{% url 'myapp:people' %}"> <i class="fas fa-plus"></i> follow more friends </a>
+    </div>
+    {% else %}
+    <div class="text-center w-100">
+        <h4 class="text-center"> follow people and friends to get posts here <i class="fas fa-smile-wink"></i>
+        </h4>
+    </div>
+    <div class="my-5  w-100 text-center ">
+        <a class="btn btn-info" href="{% url 'myapp:people' %}"> <i class="fas fa-plus"></i> follow friends </a>
+    </div>
+    {% endif %} {% endfor %}
+    <div class="col-md-8 offset-md-2">
+        <div class="pagination d-flex justify-content-center w-100 my-5">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class=" mx-5 btn btn-info"><i class="fas fa-backward"></i></a> {% endif %}
+            <span class="current mx-5 text-info my-2">
+      Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+      </span> {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="mx-5 btn btn-info"><i class="fas fa-forward"></i> </a> {% endif %}
+
+        </div>
+    </div>
+
+</div>
+{% endblock content %}

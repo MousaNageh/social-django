@@ -311,3 +311,4 @@ def addcomment(request, postid, userid):
 class CommetDetail(LoginRequiredMixin, DetailView):
     model = Post
     template_name = 'posts/postcommets.html'
+# still need to make update comment and delete comment else post search
